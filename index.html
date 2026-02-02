@@ -1,58 +1,54 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Marker-Based AR</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<head>
+  <meta charset="utf-8">
+  <title>QR Marker WebAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-    <!-- A-Frame + AR.js -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/AR-js-org/AR.js/3.3.2/aframe/build/aframe-ar.js"></script>
+  <!-- A-Frame + AR.js -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/AR-js-org/AR.js/3.3.2/aframe/build/aframe-ar.js"></script>
 
-    <!-- Our JS -->
-    <script src="app.js"></script>
+  <!-- Our JS -->
+  <script src="app.js"></script>
 
-    <style>
-      body { margin: 0; overflow: hidden; }
-      #ui {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        background: rgba(0,0,0,0.7);
-        color: white;
-        padding: 10px;
-        border-radius: 8px;
-        font-family: Arial;
-        z-index: 10;
-      }
-    </style>
-  </head>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #ui {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: Arial;
+      z-index: 10;
+    }
+  </style>
+</head>
 
-  <body>
-    <div id="ui">
-      Marker-Based AR Demo<br>
-      Point your camera at the marker to see the 3D model.
-    </div>
+<body>
+  <div id="ui">
+    QR Marker WebAR<br>
+    Point your camera at the QR on screen to see the 3D model.
+  </div>
 
-    <a-scene
-      embedded
-      arjs="sourceType: webcam; debugUIEnabled: false;"
-      vr-mode-ui="enabled: false"
-    >
-      <!-- Marker (Hiro marker) -->
-      <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/three.js/examples/marker-training/examples/pattern-files/pattern-hiro.patt">
-        <!-- 3D Model -->
-        <a-entity
-          id="model"
-          gltf-model="assets/model.glb"
-          scale="0.5 0.5 0.5"
-          rotation="0 0 0"
-          position="0 0 0"
-        ></a-entity>
-      </a-marker>
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
 
-      <!-- Camera -->
-      <a-entity camera></a-entity>
-    </a-scene>
-  </body>
+    <!-- QR marker -->
+    <a-marker type="pattern" url="assets/qr-marker.patt">
+      <!-- 3D Model -->
+      <a-entity
+        id="model1"
+        gltf-model="assets/model.glb"
+        scale="0.3 0.3 0.3"
+        rotation="0 0 0"
+        position="0 0.1 0">
+      </a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+</body>
 </html>
