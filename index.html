@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>WebAR Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <!-- Three.js + WebXR + GLTF Loader -->
+  <script src="https://unpkg.com/three@0.152/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.152/examples/jsm/webxr/ARButton.js"></script>
+  <script src="https://unpkg.com/three@0.152/examples/jsm/loaders/GLTFLoader.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #ui {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      max-width: 280px;
+    }
+
+    #status {
+      margin-top: 5px;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="ui">
+    <b>WebAR Prototype</b><br>
+    Tap on a surface to place your 3D model.<br>
+    <div id="status">Initializing...</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
