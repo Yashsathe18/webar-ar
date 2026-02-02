@@ -1,35 +1,31 @@
 window.addEventListener('DOMContentLoaded', () => {
 
+  const model = document.querySelector('#model1');
+  const marker = document.querySelector('a-marker');
   const status = document.getElementById('ui');
-  const scene = document.querySelector('a-scene');
 
-  if (!scene.hasLoaded) {
-    scene.addEventListener('loaded', () => initAR());
-  } else {
-    initAR();
-  }
+  // Rotate model continuously
+  model.setAttribute('animation', {
+    property: 'rotation',
+    to: '0 360 0',
+    loop: true,
+    dur: 10000,
+    easing: 'linear'
+  });
 
-  function initAR() {
-    const marker = document.querySelector('a-marker');
-    const model = document.querySelector('#model');
+  // Toggle model visibility on tap
+  model.addEventListener('click', () => {
+    const visible = model.getAttribute('visible');
+    model.setAttribute('visible', !visible);
+  });
 
-    // Optional: Rotate model continuously
-    model.setAttribute('animation', {
-      property: 'rotation',
-      to: '0 360 0',
-      loop: true,
-      dur: 10000,
-      easing: 'linear'
-    });
+  // Status messages
+  marker.addEventListener('markerFound', () => {
+    status.innerHTML = "QR detected! Model is visible.";
+  });
 
-    // Marker found / lost events
-    marker.addEventListener('markerFound', () => {
-      status.innerHTML = "Marker detected! Model is visible.";
-    });
-
-    marker.addEventListener('markerLost', () => {
-      status.innerHTML = "Move your camera back to the marker to see the model.";
-    });
-  }
+  marker.addEventListener('markerLost', () => {
+    status.innerHTML = "Move your camera back to the QR.";
+  });
 
 });
