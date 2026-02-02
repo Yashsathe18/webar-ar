@@ -2,11 +2,14 @@ let camera, scene, renderer;
 let reticle;
 let controller;
 let model = null;
+let hitTestSource = null;
+let localReferenceSpace = null;
+
 const statusText = document.getElementById("status");
 
 init();
 
-function init() {
+async function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(
@@ -21,7 +24,7 @@ function init() {
   renderer.xr.enabled = true;
   document.body.appendChild(renderer.domElement);
 
-  // WebXR AR Button
+  // AR Button
   document.body.appendChild(
     THREE.ARButton.createButton(renderer, {
       requiredFeatures: ["hit-test"],
@@ -30,7 +33,7 @@ function init() {
     })
   );
 
-  // Lighting
+  // Lights
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
   scene.add(light);
 
@@ -38,7 +41,7 @@ function init() {
   directionalLight.position.set(0, 10, 5);
   scene.add(directionalLight);
 
-  // Reticle (surface indicator)
+  // Reticle (white circle indicator)
   const ringGeometry = new THREE.RingGeometry(0.05, 0.06, 32);
   const ringMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
   reticle = new THREE.Mesh(ringGeometry, ringMaterial);
@@ -51,12 +54,24 @@ function init() {
   controller.addEventListener("select", onSelect);
   scene.add(controller);
 
-  // Load 3D model
+  // Load model
   loadModel();
 
-  renderer.setAnimationLoop(render);
+  renderer.xr.addEventListener("sessionstart", onSessionStart);
 
+  renderer.setAnimationLoop(render);
   window.addEventListener("resize", onWindowResize);
+}
+
+async function onSessionStart() {
+  const session = renderer.xr.getSession();
+
+  localReferenceSpace = await session.requestReferenceSpace("local");
+
+  const viewerSpace = await session.requestReferenceSpace("viewer");
+  hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
+
+  statusText.innerText = "Move phone to detect surface...";
 }
 
 function loadModel() {
@@ -81,7 +96,7 @@ function loadModel() {
       model.visible = false;
       scene.add(model);
 
-      statusText.innerText = "Model Loaded. Tap to place.";
+      statusText.innerText = "Model loaded. Tap to place.";
     },
     undefined,
     function (error) {
@@ -99,31 +114,17 @@ function onSelect() {
 }
 
 function render(timestamp, frame) {
-  if (frame) {
-    const referenceSpace = renderer.xr.getReferenceSpace();
-    const session = renderer.xr.getSession();
+  if (frame && hitTestSource && localReferenceSpace) {
+    const hitTestResults = frame.getHitTestResults(hitTestSource);
 
-    if (session) {
-      const viewerPose = frame.getViewerPose(referenceSpace);
+    if (hitTestResults.length > 0) {
+      const hit = hitTestResults[0];
+      const pose = hit.getPose(localReferenceSpace);
 
-      if (viewerPose) {
-        const hitTestSource = session.requestHitTestSource
-          ? session.requestHitTestSource({
-              space: viewerPose.views[0].transform
-            })
-          : null;
+      reticle.visible = true;
+      reticle.matrix.fromArray(pose.transform.matrix);
 
-        if (hitTestSource) {
-          const hitTestResults = frame.getHitTestResults(hitTestSource);
-
-          if (hitTestResults.length > 0) {
-            const pose = hitTestResults[0].getPose(referenceSpace);
-            reticle.visible = true;
-            reticle.matrix.fromArray(pose.transform.matrix);
-            statusText.innerText = "Surface detected. Tap to place.";
-          }
-        }
-      }
+      statusText.innerText = "Surface detected. Tap to place.";
     }
   }
 
@@ -134,4 +135,4 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+}
